@@ -1,18 +1,37 @@
+const express = require('express');
 const http = require('http');
+const socketIo = require('socket.io');
 
-// Create an HTTP server
-const server = http.createServer((req, res) => {
-  // Set the response HTTP header with status code and content type
-  res.writeHead(200, {'Content-Type': 'text/plain'});
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+const PORT = 443
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
   
-  // Send the response body "Hello, World!"
-  res.end('Hello, World!\n');
-});
+    socket.on('join', (data) => {
+        const { conversationId, userId } = data;
 
-// Define the port number to listen on
-const port = 443;
+        // Join room based on conversation ID
+        socket.join(conversationId);
+        console.log(`User ${userId} joined conversation ${conversationId}`);
+    });
+  
+    socket.on('typing', (data) => {
+        const { conversationId, userId, isTyping } = data;
+        
+        // Broadcast typing event to all users in the conversation except the sender
+        socket.to(conversationId).emit('typing', { userId, isTyping });
+        console.log(`User ${userId} is typing in conversation ${conversationId}`);
+    });
+  
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+  });
 
-// Start the server and listen on the specified port
-server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
