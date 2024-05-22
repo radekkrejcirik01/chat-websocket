@@ -3,10 +3,14 @@ const http = require('http');
 const socketIo = require('socket.io');
 
 const app = express();
-const server = http.createServer(app);
 const io = socketIo(server);
 
 const PORT = 3000
+
+const server = http.createServer(app, (req, res) => {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Hello, world!\n');
+});
 
 io.on('connection', (socket) => {
     console.log('New client connected');
