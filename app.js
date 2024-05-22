@@ -10,9 +10,9 @@ const server = http.createServer((req, res) => {
 });
 
 // Define the port number to listen on
-const port = 3000;
+const port = 80;
 
 // Start the server and listen on the specified port
 server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+  console.log(`Server running on port ${port}`);
 });
